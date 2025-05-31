@@ -1,0 +1,69 @@
+#include <Servo.h>
+
+#define SENSOR_ESQUERDO A4
+#define SENSOR_DIREITO A5
+
+#define SERVO_ESQUERDO 6
+#define SERVO_DIREITO 5
+
+#define LIMIAR 690
+
+#define VELOCIDADE_MAX 0
+#define VELOCIDADE_MIN 180
+#define VELOCIDADE_PARAR 90
+
+Servo servoEsquerdo;
+Servo servoDireito;
+
+void setup() {
+  servoEsquerdo.attach(SERVO_ESQUERDO);
+  servoDireito.attach(SERVO_DIREITO);
+  pararRobo();
+  Serial.begin(9600);
+  delay(1000);
+}
+
+void loop() {
+  int valorEsquerdo = analogRead(SENSOR_ESQUERDO);
+  int valorDireito = analogRead(SENSOR_DIREITO);
+  
+  Serial.print("Esquerdo: ");
+  Serial.print(valorEsquerdo);
+  Serial.print(" | Direito: ");
+  Serial.println(valorDireito);
+  
+  if (valorEsquerdo < LIMIAR && valorDireito < LIMIAR) {
+    moverFrente();
+  } 
+  else if (valorEsquerdo < LIMIAR && valorDireito >= LIMIAR) {
+    virarEsquerda();
+  } 
+  else if (valorEsquerdo >= LIMIAR && valorDireito < LIMIAR) {
+    virarDireita();
+  } 
+  else {
+    pararRobo();
+  }
+  
+  delay(20);
+}
+
+void moverFrente() {
+  servoEsquerdo.write(VELOCIDADE_MAX);
+  servoDireito.write(VELOCIDADE_MIN);
+}
+
+void virarDireita() {
+  servoEsquerdo.write(VELOCIDADE_MAX);
+  servoDireito.write(VELOCIDADE_PARAR);
+}
+
+void virarEsquerda() {
+  servoEsquerdo.write(VELOCIDADE_PARAR);
+  servoDireito.write(VELOCIDADE_MIN);
+}
+
+void pararRobo() {
+  servoEsquerdo.write(VELOCIDADE_PARAR);
+  servoDireito.write(VELOCIDADE_PARAR);
+}
